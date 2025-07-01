@@ -1,0 +1,41 @@
+3. Câu hỏi nâng cao (Senior - Architect)
+Làm sao để scale một hệ thống có hàng triệu người dùng?
+
+Trình bày cách xây dựng hệ thống event-driven microservices.
+
+Làm sao xử lý consistency vs availability trong hệ thống phân tán?
+
+Làm sao thiết kế hệ thống resilient (khả năng chịu lỗi)?
+
+Trình bày về các kiểu giao tiếp giữa các microservices (Sync, Async, Saga…)
+
+Làm sao bạn thiết kế hệ thống log, audit, trace trong kiến trúc?
+
+Clean Architecture có phù hợp với mọi dự án không?
+
+Làm sao áp dụng DDD trong hệ thống đã tồn tại?
+
+Làm sao thiết kế schema DB để không bị “leak” nghiệp vụ?
+
+Kể một lần bạn đã refactor một kiến trúc xấu – và cách làm cụ thể?
+
+4. Các chủ đề liên quan thường bị hỏi kèm
+Domain-Driven Design (DDD)
+
+Event-Driven Architecture
+
+Eventual Consistency
+
+Saga Pattern vs Transaction Chaining
+
+Message Broker (Kafka, RabbitMQ)
+
+Circuit Breaker, Retry, Backoff
+
+CAP Theorem
+
+Caching layer (Redis, CDN...)
+
+API versioning, rate limiting
+
+Deployment architecture (blue/green, canary...)

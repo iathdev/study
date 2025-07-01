@@ -1,6 +1,6 @@
-3.0 Câu hỏi
+# Câu hỏi
 
-1.Trong Apache Kafka, khi số lượng consumer (người tiêu thụ) khác với số lượng partition (phân vùng) trong một consumer group, Kafka có những cơ chế phân phối riêng. Dưới đây là phân tích cụ thể 3 trường hợp:
+### 1.Trong Apache Kafka, khi số lượng consumer (người tiêu thụ) khác với số lượng partition (phân vùng) trong một consumer group, Kafka có những cơ chế phân phối riêng. Dưới đây là phân tích cụ thể 3 trường hợp:
 
 ✅ 1. Số lượng Consumer < Số lượng Partition
 📌 Ví dụ: 2 consumer, 4 partition

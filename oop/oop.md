@@ -17,9 +17,21 @@ Tính chất:
 3. Polymorphism (đa hình) - interface
 Một hành động, nhiều cách thực hiện
 
+Trong Java, C#, C++, Python... đa hình thường có hai dạng:
+- Compile-time polymorphism (Overloading) – cùng tên hàm, khác tham số.
+- Runtime polymorphism (Overriding) – subclass override lại phương thức từ superclass.
+
 Tính chất:
 - Một interface nhưnng có nhiều class triển khai theo cách riêng
 - Giúp hệ thống mở rộng mà không sửa code cũ
+
+Tại sao tính đa hình quan trọng?
+- Đáp ứng được tính đa dạng của đối tượng trong thiết kế
+- Giảm sự phụ thuộc giữa các phần của hệ thống
+- Mở rộng hệ thống mà không sửa code cũ (Open/Closed Principle)
+- Tối ưu hóa tái sử dụng và tổ chức lại logic
+- Cho phép áp dụng Design Pattern
+- Giúp kiểm thử (test) dễ dàng hơn
 
 | Mục tiêu                         | Vai trò của Đa hình                                      |
 | -------------------------------- | -------------------------------------------------------- |

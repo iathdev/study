@@ -162,6 +162,9 @@
 - Dữ liệu giữa master - slave có thể không đồng bộ → **data inconsistency**
 - Không tự động failover
 
+#### Failover là gì?
+Failover là cơ chế tự động chuyển đổi sang hệ thống dự phòng (backup) khi hệ thống chính gặp sự cố (crash, lỗi phần cứng, mất kết nối, v.v). Mục tiêu là duy trì dịch vụ liên tục, giảm thời gian gián đoạn (downtime) và tăng tính sẵn sàng (high availability).
+
 ---
 
 ### 6.2 Sentinel
@@ -238,7 +241,8 @@ Redis sẽ thực hiện theo `maxmemory-policy`
 - **Ưu điểm**: Ít mất dữ liệu
 - **Nhược điểm**: File lớn, khôi phục lâu
 
-### 9.2 RDB (Snapshot)
+### 9.2 RDB (Redis Database Backup - Snapshot)
+- Redis định kỳ chụp nhanh (snapshot) toàn bộ dữ liệu và lưu vào file .rdb
 - Snapshot dữ liệu theo chu kỳ
 - Lưu trữ dạng binary `.rdb`
 
@@ -251,5 +255,68 @@ Redis sẽ thực hiện theo `maxmemory-policy`
 
 ## 10. Cơ chế xóa dữ liệu hết hạn
 
-- Khi gọi đến key hết hạn → Redis sẽ xóa key đó (lazy deletion)
-- Redis sử dụng một thuật toán để kiểm tra ng
+### 1. Lazy Deletion (Xóa Lười)
+
+- Khi **truy cập một key** (GET, SET, v.v.), Redis **kiểm tra xem key đó đã hết hạn chưa**
+- Nếu đã hết hạn, **Redis sẽ xóa ngay lập tức**
+- Nếu không có ai truy cập vào key → **nó vẫn tồn tại** trong bộ nhớ
+
+### 2. Active Expiration Cycle (Xóa Chủ Động Định Kỳ)
+- Redis sẽ định kỳ quét ngẫu nhiên các key có thiết lập thời gian hết hạn (EXPIRE)
+- Nếu phát hiện key đã hết hạn → xóa
+- Redis giới hạn số lượng key được quét mỗi lần để không gây quá tải CPU
+- Redis không quét toàn bộ key vì điều đó tốn tài nguyên lớn
+
+### 3. Eviction (Khi Thiếu Bộ Nhớ)
+- Khi Redis đạt đến maxmemory (giới hạn bộ nhớ), nó sẽ kích hoạt cơ chế eviction
+- Redis sẽ xóa key dựa trên chính sách được cấu hình trong maxmemory-policy
+- Trong nhiều chính sách, Redis ưu tiên xóa các key đã hết hạn trước
+
+Chính sách:
+- LRU (Least Recently Used) – Ít được sử dụng gần đây nhất
+  - Ưu tiên xóa các key nào lâu rồi không được truy cập
+- LFU (Least Frequently Used) – Ít được truy cập thường xuyên nhất
+  - Ưu tiên xóa những key nào bị truy cập ít nhất, bất kể gần đây hay không
+
+| Tiêu chí                 | LRU                        | LFU                              |
+| ------------------------ | -------------------------- | -------------------------------- |
+| Dựa vào                  | Thời điểm sử dụng gần nhất | Tần suất sử dụng (frequency)     |
+| Dữ liệu “lâu không dùng” | Sẽ bị xóa                  | Có thể giữ nếu dùng nhiều        |
+| Dữ liệu “vừa mới dùng”   | Có thể giữ                 | Có thể bị xóa nếu dùng ít        |
+| Phù hợp với              | Web cache ngắn hạn         | Hệ thống có hot key, phân bổ đều |
+| Cần theo dõi             | Thời gian gần nhất sử dụng | Số lần sử dụng                   |
+
+Tổng quan cơ chế xoá dữ liệu hết hạn
+
+| Cơ chế               | Khi nào kích hoạt     | Ưu điểm                    | Nhược điểm                    |
+| -------------------- | --------------------- | -------------------------- | ----------------------------- |
+| Lazy deletion        | Khi key được truy cập | Không tốn tài nguyên       | Key chết vẫn chiếm RAM        |
+| Active expiration    | Chạy định kỳ nội bộ   | Tự động dọn rác nhẹ nhàng  | Có thể không xóa ngay lập tức |
+| Eviction khi đầy RAM | Khi vượt `maxmemory`  | Tránh crash khi hết bộ nhớ | Có thể xóa key chưa hết hạn   |
+
+
+### 11. Cơ chế sao lưu dữ liệu từ Master sang Slave
+Quá trình sao lưu dữ liệu từ Master sang Slave trong Redis bao gồm hai giai đoạn chính: 
+- Đồng bộ hóa toàn bộ (Full Synchronization) 
+- Sao chép lệnh (Command Propagation).
+
+Tóm tắt cơ chế sao lưu dữ liệu từ Master sang Slave trong Redis
+- Master-Slave Replication trong Redis sao chép dữ liệu từ 
+- Master (xử lý ghi/đọc) sang Slave (chỉ đọc) để cân bằng tải, đảm bảo sẵn sàng cao và dự phòng dữ liệu. Cơ chế gồm:
+
+#### 11.1 Đồng bộ hóa toàn bộ (Full Synchronization):
+Khi một Slave kết nối lần đầu với Master hoặc khi kết nối bị gián đoạn quá lâu, quá trình đồng bộ hóa toàn bộ được thực hiện:
+- Slave gửi `PSYNC/SYNC` đến Master.
+- Master tạo và gửi snapshot RDB, Slave tải và áp dụng.
+- Master gửi các lệnh ghi tích lũy trong quá trình truyền.
+
+#### 11.2 Sao chép lệnh (Command Propagation):
+Sau khi hoàn tất đồng bộ hóa toàn bộ, Redis chuyển sang giai đoạn sao chép lệnh để giữ cho Slave luôn đồng bộ với Master:
+- Master gửi lệnh ghi (như SET, DEL) đến Slave qua luồng sao chép.
+- Slave thực thi lệnh để đồng bộ dữ liệu.
+- Hỗ trợ đồng bộ hóa một phần (partial resynchronization) để giảm tải khi kết nối gián đoạn.
+
+#### Đặc điểm:
+- Không đồng bộ (asynchronous), có thể gây độ trễ nhỏ.
+- Slave chỉ đọc, hỗ trợ cân bằng tải và sao lưu.
+- Tốn tài nguyên khi đồng bộ hóa toàn bộ.

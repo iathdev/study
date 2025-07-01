@@ -78,29 +78,40 @@ Là lớp trung gian giữa lớp business logic và lớp hạ tầng (Infrastr
 
 ## 9. SOLID Principles
 
-### 1. Single Responsibility Principle (SRP)
+### 1. Single Responsibility Principle (SRP) - trách nhiệm
 - Một class chỉ có một trách nhiệm duy nhất.
 
 **VD**: Mỗi Action chỉ xử lý một logic cụ thể. Ví dụ: Action tính hoàn tiền khi huỷ vé.
 
-### 2. Open/Closed Principle (OCP)
+Ví dụ trong logistics:
+<br>Thay vì chỉ có một class làm tất cả các nhiệm vụ ShipmentService: tính phí, gửi mail, lưu DB thì chia thành các class với trách nhiệm riêng biệt
+
+| Trách nhiệm         | Class đảm nhận           |
+| ------------------- | ------------------------ |
+| Tính phí vận chuyển | `ShippingCostCalculator` |
+| Gửi email           | `NotificationService`    |
+| Ghi DB              | `ShipmentRepository`     |
+| Điều phối workflow  | `ShipmentService`        |
+
+
+### 2. Open/Closed Principle (OCP) - đóng mở
 - Class nên mở rộng, không nên sửa đổi trực tiếp.
 
 **VD**: 
 - Framework: Model, Controller kế thừa từ core.
 - Hệ thống quét vé có thể mở rộng thêm nhiều phương thức (QR, nút bấm) thông qua interface `ProductUsageInterface` với hàm `usage()`.
 
-### 3. Liskov Substitution Principle (LSP)
+### 3. Liskov Substitution Principle (LSP) - Thay thế cha
 - Class con có thể thay thế class cha mà không làm thay đổi tính đúng đắn của chương trình
 
 **VD**: Class con không được thay đổi kiểu trả về — cha return `Collection` thì con cũng phải return `Collection`.
 
-### 4. Interface Segregation Principle (ISP)
+### 4. Interface Segregation Principle (ISP) - Tách interface
 - Interface nên nhỏ, chuyên biệt.
 
 **VD**: Không gom tất cả phương thức di chuyển vào 1 interface `Movable` mà nên chia nhỏ như: `Flyable`, `Runnable`, `Swimmable`
 
-### 5. Dependency Inversion Principle (DIP)
+### 5. Dependency Inversion Principle (DIP) - Dependency
 - Module cấp cao không phụ thuộc module cấp thấp. Cả hai nên phụ thuộc abstraction (interface).
 
 

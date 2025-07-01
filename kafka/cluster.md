@@ -63,6 +63,24 @@ ISR broker (In-Sync Replicas)
 
 2.3 Producer ACK
 
+- Trong hệ thống xử lý message bất đồng bộ, khi một consumer (người nhận) xử lý xong một message, nó phải gửi ACK để báo với hệ thống (hoặc broker) rằng:
+```
+“Tôi đã nhận và xử lý message này thành công, không cần gửi lại.”
+```
+
+Nếu consumer không ACK, thì hệ thống sẽ:
+- Giả định xử lý thất bại
+- Và có thể gửi lại message đó cho consumer khác (retry / requeue)
+
+Với Kafka:
+- ACK xảy ra từ phía Producer → Kafka Broker
+
+Nó giúp:
+- Đảm bảo độ tin cậy trong truyền tải
+- Tránh mất mát hoặc trùng lặp dữ liệu
+- Điều phối lại message nếu consumer gặp lỗi
+
+
 | Giá trị         | Mô tả                                                                                                                                                 |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `0`             | **Producer không cần xác nhận** từ broker. Gửi là xong, không quan tâm thành công hay thất bại. Hiệu suất cao nhưng dễ mất dữ liệu.                   |
