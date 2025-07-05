@@ -6,8 +6,6 @@ Dữ liệu được chia theo khoảng giá trị của một cột (thường 
 Ví dụ: Phân chia khách hàng theo vùng (region) dựa trên ID vùng:
 
 ```sql
-Sao chép
-Chỉnh sửa
 PARTITION BY RANGE (region_id) (
     PARTITION p_north VALUES LESS THAN (100),
     PARTITION p_central VALUES LESS THAN (200),
@@ -21,8 +19,6 @@ Chia dữ liệu theo danh sách giá trị cụ thể.
 Ví dụ: Phân chia theo tên vùng:
 
 ```sql
-Sao chép
-Chỉnh sửa
 PARTITION BY LIST (region_name) (
     PARTITION p_north VALUES IN ('North', 'NorthEast'),
     PARTITION p_central VALUES IN ('Central'),
@@ -45,8 +41,6 @@ Dữ liệu được chia dựa trên hàm băm của một cột (phân bố đ
 Ví dụ:
 
 ```sql
-Sao chép
-Chỉnh sửa
 PARTITION BY HASH(region_id) PARTITIONS 4;
 ```
 Các giá trị region_id sẽ được chia vào 4 partition một cách ngẫu nhiên nhưng đều.
@@ -57,8 +51,6 @@ Tương tự Hash, nhưng dùng khóa chính hoặc khóa định nghĩa bởi h
 Ví dụ (MySQL InnoDB):
 
 ```sql
-Sao chép
-Chỉnh sửa
 PARTITION BY KEY(region_id) PARTITIONS 3;
 ```
 
